@@ -22,7 +22,7 @@ markdown — nothing to build, no dependencies of its own.
 - **Personal scope — stay narrow.** One person's roll: add only knives that are actually used,
   never grow it toward completeness, and never present it as a replacement for other setups
   (dotfiles, package managers, distro tooling, or anyone else's installer).
-- **Use the tool's own installer** (sdkman, `sdkmanager`, Maestro's script) instead of
+- **Use the tool's own installer** (sdkman, the Android CLI's `android sdk`, Maestro's script) instead of
   reimplementing it.
 - **Keep it short.** If a file needs explaining, the file is too long.
 
