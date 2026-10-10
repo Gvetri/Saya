@@ -1,0 +1,6 @@
+# Android — the knives for building APKs.
+# Order matters: sdkman, then the JDK, then the SDK (needs java on PATH), then Maestro.
+sdkman
+temurin-21
+android-cli
+maestro
