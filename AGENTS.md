@@ -23,9 +23,10 @@ The skill is installed with the open `skills` CLI (npx), which supports Hermes a
 npx skills add Gvetri/Saya -g -a hermes-agent
 ```
 
-The installed skill carries **no scripts**. It bootstraps: it clones this repo to `~/.saya`
-(or `$SAYA_DIR`) and runs `scripts/unpack.sh` from there — so the racks and the script have one
-source of truth and never drift from a copy.
+The installed skill carries **no scripts**. It bootstraps: it clones this repo into a temp dir,
+runs `scripts/unpack.sh` from there, then deletes the clone — so the racks and the script have one
+source of truth while it runs, and the host keeps no copy afterwards. Re-running unpack clones
+again.
 
 ## Conventions
 

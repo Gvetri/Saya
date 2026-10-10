@@ -34,15 +34,15 @@ Install the skill into your agent (the CLI knows Hermes as `hermes-agent`):
 npx skills add Gvetri/Saya -g -a hermes-agent      # also: -a codex -a pi -a cursor
 ```
 
-Then, in the agent, ask it to **unpack** a rack — it fetches the roll and runs the plan:
+Then, in the agent, ask it to **unpack** a rack. The skill fetches the roll into a temp dir, runs
+it, and deletes it again — so the host ends up with the installed tools and **no clone**:
 
 ```sh
-~/.saya/scripts/unpack.sh android           # plan: prints what would be installed
-~/.saya/scripts/unpack.sh android --apply   # do it
+roll="$(mktemp -d)"; git clone --depth 1 -q https://github.com/Gvetri/Saya "$roll" \
+  && "$roll/scripts/unpack.sh" android; rm -rf "$roll"
 ```
 
-The skill itself is thin on purpose: it downloads the roll (`git clone` → `~/.saya`) and then
-runs the script from there, so the racks and the script stay a single source of truth.
+Re-running unpack simply clones again. Nothing of the roll persists between runs.
 
 Today there is one rack — **`android`**: sdkman, Temurin JDK 21, the Android CLI
 (cmdline-tools 23.0) + SDK, and Maestro.

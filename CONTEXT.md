@@ -29,8 +29,10 @@ skills/    what an agent should know    (instructions)
   and only run racks you trust.
 - **Distributed as a skill, not a bundle.** `npx skills add Gvetri/Saya -g -a hermes-agent`
   installs only `skills/unpack/SKILL.md`. The skill deliberately carries no scripts: it clones the
-  repo to `~/.saya` and runs `scripts/unpack.sh` from the clone, so there is exactly one copy of
-  the logic and the racks. Bundling a second copy inside the skill would drift.
+  repo into a temp dir, runs `scripts/unpack.sh` from it, then **deletes the clone**. Exactly one
+  copy of the logic and the racks exists, and only while a run is in flight — the end state on a
+  host is the installed skills and no repo. Bundling a second copy inside the skill would drift;
+  keeping a clone around would just be a second copy waiting to.
 - **Order matters.** In a rack, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
   installer needs a JDK on PATH.
 - **Android CLI, not `sdkmanager`.** cmdline-tools 23.0 ships a new `android` binary and marks

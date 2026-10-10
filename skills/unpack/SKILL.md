@@ -1,36 +1,32 @@
 ---
 name: unpack
-description: Use when provisioning a host from the Saya knife roll — installing the cherry-picked tools for that host (e.g. the Android toolchain). Fetches the roll, shows the plan, and installs only after the user says yes.
+description: Use when provisioning a host from the Saya knife roll — installing the cherry-picked tools for that host (e.g. the Android toolchain). Fetches the roll, shows the plan, installs only after a yes, then deletes the clone.
 ---
 
 # unpack
 
 Saya is the sheath; a **rack** in `racks/` is what a given kitchen needs.
 
+The roll is fetched, used, and **thrown away**. Only the installed skills stay on the host;
+every run re-downloads the roll.
+
 ## Do this
 
-1. **Get the roll.** This skill carries no scripts — they live in the repo, so fetch it:
+1. **Plan first, always.** Fetch, plan, delete — show the user the plan, then wait:
 
    ```sh
-   roll="${SAYA_DIR:-$HOME/.saya}"
-   if [ -d "$roll/.git" ]; then git -C "$roll" pull --ff-only; else git clone https://github.com/Gvetri/Saya "$roll"; fi
+   roll="$(mktemp -d)"; git clone --depth 1 -q https://github.com/Gvetri/Saya "$roll" \
+     && "$roll/scripts/unpack.sh" android; rm -rf "$roll"
    ```
 
-2. **Pick the rack** for this host — today there is one: `android`.
-
-3. **Plan first, always.** Show the user what would happen, then wait:
+2. **Only after a yes** — the same, with `--apply`:
 
    ```sh
-   "$roll/scripts/unpack.sh" android
+   roll="$(mktemp -d)"; git clone --depth 1 -q https://github.com/Gvetri/Saya "$roll" \
+     && "$roll/scripts/unpack.sh" android --apply; rm -rf "$roll"
    ```
 
-4. **Only after a yes:**
-
-   ```sh
-   "$roll/scripts/unpack.sh" android --apply
-   ```
-
-5. **Verify** it actually works:
+3. **Verify** it actually works:
 
    ```sh
    export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
@@ -44,8 +40,12 @@ Saya is the sheath; a **rack** in `racks/` is what a given kitchen needs.
 ## Rules
 
 - Never install without showing the plan and getting an explicit yes.
+- **Leave no repo behind.** The `rm -rf "$roll"` is separated by `;` so it runs even when the
+  clone or the unpack fails — a half-finished run must not leave a checkout on the host. The end
+  state is always: the installed tools plus the npx-installed skill, and no clone.
+- **Never edit inside the clone** — it is deleted by design; rack changes belong in the repo.
 - Never guess a version — `sdk list java` and `android sdk list` confirm the exact id before
   pinning one.
 - `git`, `curl` and `unzip` are prerequisites the rack does not install.
-- The roll is a personal repo: a rack is *sourced*, so it is code — unpack only racks you trust.
+- A rack is *sourced*, so it is code — unpack only racks you trust.
 - Adding a knife = one `knife_<name>()` in `scripts/unpack.sh` plus a line in `racks/<rack>.conf`.
