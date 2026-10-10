@@ -33,8 +33,8 @@ scripts/unpack.sh android           # plan: prints what would be installed
 scripts/unpack.sh android --apply   # do it
 ```
 
-Today there is one rack — **`android`**: sdkman, Temurin JDK 21, the Android command-line
-tools + SDK, and Maestro.
+Today there is one rack — **`android`**: sdkman, Temurin JDK 21, the Android CLI
+(cmdline-tools 23.0) + SDK, and Maestro.
 
 A rack is `racks/<name>.conf`: a tiny shell file declaring `knives=(...)` (plus any versions or
 packages it needs). It is *sourced*, so the shell itself is the parser — no parser to install,

@@ -34,7 +34,8 @@ sh_()  { [ "$APPLY" = "true" ] && "$@" || return 0; }   # dry-run: print only
 # Defaults — a rack may override any of these by declaring them.
 knives=()
 temurin_version="21.0.12-tem"
-android_packages=(platform-tools "platforms;android-35" "build-tools;35.0.0")
+android_cmdline_tools="16111833"                                            # cmdline-tools 23.0
+android_packages=(platform-tools platforms/android-35 build-tools/35.0.0)   # new Android CLI syntax
 
 # shellcheck source=/dev/null
 source "$RACK_FILE"
@@ -56,9 +57,9 @@ knife_temurin_21() {
 
 knife_android_cli() {
   local root="${ANDROID_HOME:-$HOME/Android/Sdk}"
-  local url="https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip"
-  step "cmdline-tools -> $root/cmdline-tools/latest"
-  step "sdkmanager --licenses ; sdkmanager ${android_packages[*]}"
+  local url="https://dl.google.com/android/repository/commandlinetools-linux-${android_cmdline_tools}_latest.zip"
+  step "cmdline-tools ${android_cmdline_tools} -> $root/cmdline-tools/latest"
+  step "android sdk install ${android_packages[*]}"
   sh_ bash -euo pipefail -c '
     root="$1"; url="$2"; shift 2; packages=("$@"); tmp="$(mktemp -d)"
     mkdir -p "$root/cmdline-tools"
@@ -66,9 +67,8 @@ knife_android_cli() {
     unzip -q "$tmp/tools.zip" -d "$tmp"
     rm -rf "$root/cmdline-tools/latest"
     mv "$tmp/cmdline-tools" "$root/cmdline-tools/latest"
-    sm="$root/cmdline-tools/latest/bin/sdkmanager"
-    yes | "$sm" --sdk_root="$root" --licenses >/dev/null || true
-    "$sm" --sdk_root="$root" "${packages[@]}"
+    android="$root/cmdline-tools/latest/bin/android"
+    "$android" --sdk="$root" sdk install "${packages[@]}"
     rm -rf "$tmp"
   ' _ "$root" "$url" "${android_packages[@]}"
 }

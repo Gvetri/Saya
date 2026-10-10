@@ -29,6 +29,13 @@ skills/    what an agent should know    (instructions)
   and only run racks you trust.
 - **Order matters.** In a rack, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
   installer needs a JDK on PATH.
+- **Android CLI, not `sdkmanager`.** cmdline-tools 23.0 ships a new `android` binary and marks
+  `sdkmanager` deprecated; the knife uses `android sdk install <pkg>` with slash paths
+  (`platforms/android-35`). Licences need no separate step — they are accepted during install,
+  which also removes the old `yes | … --licenses` pipefail trap.
+- **`android init` is deliberately NOT in the knife.** It installs an `android-cli` skill into
+  *every* agent's skills directory (`~/.hermes`, `~/.codex`, `~/.cursor`, `~/.pi`, …) and ignores
+  `HOME`, so it cannot be sandboxed or dry-run. Run it by hand, on purpose, if the skill is wanted.
 
 ## Not here
 
