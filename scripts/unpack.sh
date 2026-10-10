@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
-# Saya — unpack a knife set onto this host.
+# Saya — unpack a rack of knives onto this host.
 #
-#   scripts/unpack.sh <set>            plan only (default): prints what would run
-#   scripts/unpack.sh <set> --apply    actually install
+#   scripts/unpack.sh <rack>            plan only (default): prints what would run
+#   scripts/unpack.sh <rack> --apply    actually install
 #
-# A set is a file in lists/<set>.txt: one knife per line, `#` for comments.
+# A rack is a file in racks/<rack>.txt: one knife per line, `#` for comments.
 set -euo pipefail
 
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-LISTS_DIR="$REPO_DIR/lists"
+RACKS_DIR="$REPO_DIR/racks"
 
-SET="${1:-}"
+RACK="${1:-}"
 APPLY="false"
 [ "${2:-}" = "--apply" ] && APPLY="true"
 
 usage() {
-  echo "usage: unpack.sh <set> [--apply]"
-  echo "sets:"
-  ls "$LISTS_DIR" 2>/dev/null | sed 's/\.txt$//' | sed 's/^/  /'
+  echo "usage: unpack.sh <rack> [--apply]"
+  echo "racks:"
+  ls "$RACKS_DIR" 2>/dev/null | sed 's/\.txt$//' | sed 's/^/  /'
   exit 2
 }
-[ -n "$SET" ] || usage
-LIST="$LISTS_DIR/$SET.txt"
-[ -f "$LIST" ] || { echo "no such set: $SET" >&2; usage; }
+[ -n "$RACK" ] || usage
+RACK_FILE="$RACKS_DIR/$RACK.txt"
+[ -f "$RACK_FILE" ] || { echo "no such rack: $RACK" >&2; usage; }
 
 log()  { printf '%s\n' "$*"; }
 step() { log "    \$ $*"; }
@@ -67,7 +67,7 @@ knife_maestro() {
 }
 
 # ---- runner ----------------------------------------------------------------
-log "set: $SET  [$([ "$APPLY" = true ] && echo apply || echo plan)]"
+log "rack: $RACK  [$([ "$APPLY" = true ] && echo apply || echo plan)]"
 log ""
 while read -r line; do
   case "$line" in ''|\#*) continue;; esac
@@ -75,6 +75,6 @@ while read -r line; do
   declare -F "$fn" >/dev/null || { echo "! no installer for '$line'" >&2; exit 3; }
   log "-> $line"
   "$fn"
-done < "$LIST"
+done < "$RACK_FILE"
 log ""
 [ "$APPLY" = true ] && log "done." || log "plan only — re-run with --apply to install."

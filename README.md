@@ -22,7 +22,7 @@ This is a **personal** roll, for my own machines — not a distribution and not 
 | `AGENTS.md` | entry point for an agent — how to unpack on a new host |
 | `CONTEXT.md` | what this is, the metaphor, the decisions |
 | `GLOSSARY.md` | shared vocabulary |
-| `lists/` | the cherry-picked sets — one file per kind of host |
+| `racks/` | the knives kept out for one kind of kitchen — one rack per host |
 | `scripts/` | the logic; small, one job per knife |
 | `skills/` | agent skills — instructions, not libraries |
 
@@ -33,7 +33,7 @@ scripts/unpack.sh android           # plan: prints what would be installed
 scripts/unpack.sh android --apply   # do it
 ```
 
-Today there is one set — **`android`**: sdkman, Temurin JDK 21, the Android command-line
+Today there is one rack — **`android`**: sdkman, Temurin JDK 21, the Android command-line
 tools + SDK, and Maestro.
 
 ## Status

@@ -8,7 +8,7 @@ the sheath travels. This repo ships the knives, and a **set** is the subset a gi
 ## Shape
 
 ```
-lists/     what to unpack, per host     (data)
+racks/     the knives kept out, per host (data)
 scripts/   how to unpack it             (logic)
 skills/    what an agent should know    (instructions)
 *.md       entry point, context, vocabulary
@@ -16,14 +16,14 @@ skills/    what an agent should know    (instructions)
 
 ## Decisions
 
-- **Android first.** The first set is `android` because that toolchain carries real setup cost:
+- **Android first.** The first rack is `android` because that toolchain carries real setup cost:
   sdkman + Temurin JDK 21 + the Android command-line tools + Maestro.
 - **sdkman owns the JDK.** Java arrives via sdkman, so `JAVA_HOME` points at
   `~/.sdkman/candidates/java/current` rather than at a distro package.
 - **The SDK lives outside the repo.** `ANDROID_HOME` defaults to `~/Android/Sdk`. Nothing large
   is ever committed here.
 - **Dry-run by default.** The script prints the plan; `--apply` is the explicit second step.
-- **Order matters.** In a set, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
+- **Order matters.** In a rack, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
   installer needs a JDK on PATH.
 
 ## Not here

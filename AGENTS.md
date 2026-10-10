@@ -10,7 +10,7 @@ markdown — nothing to build, no dependencies of its own.
 ## Unpacking on a new host
 
 1. `README.md` for the layout, `CONTEXT.md` for why.
-2. Pick the set in `lists/` for that host (today: `android`).
+2. Pick the rack in `racks/` for that host (today: `android`).
 3. Follow `skills/unpack/SKILL.md`: plan, get a yes, then `--apply`.
 4. `scripts/unpack.sh` is the only executable logic, and it is a **dry-run by default**.
 
@@ -29,5 +29,5 @@ markdown — nothing to build, no dependencies of its own.
 ## Adding a knife
 
 1. Add `knife_<name>()` to `scripts/unpack.sh`.
-2. Add `<name>` to the relevant `lists/<set>.txt`.
+2. Add `<name>` to the relevant `racks/<rack>.txt`.
 3. Note anything host-specific under `CONTEXT.md` → Decisions.
