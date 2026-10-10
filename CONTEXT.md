@@ -3,7 +3,7 @@
 ## The metaphor
 
 A **saya** is the wooden sheath that carries a knife and protects its edge. Kitchens differ;
-the sheath travels. This repo ships the knives, and a **set** is the subset a given kitchen needs.
+the sheath travels. This repo ships the knives, and a **rack** is the subset a given kitchen needs.
 
 ## Shape
 
