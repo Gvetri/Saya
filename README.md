@@ -5,6 +5,16 @@ and scripts I want on hand when I sit down at a new workstation.
 
 The sheath travels; the kitchen doesn't. Unpack only the knives that kitchen needs.
 
+## Scope
+
+This is a **personal** roll, for my own machines — not a distribution and not a framework.
+
+- It holds what I actually use, not everything a developer might want. No attempt to be
+  complete or to cover every feature of any tool.
+- It is **not a replacement for anything else** — not for dotfiles, not for a package manager,
+  not for a distro's tooling, and not for anyone else's setup. It sits beside them.
+- Where a tool ships its own installer, Saya calls that installer rather than reimplementing it.
+
 ## Layout
 
 | Path | Purpose |

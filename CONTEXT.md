@@ -29,3 +29,16 @@ skills/    what an agent should know    (instructions)
 ## Not here
 
 No CI, no tests, no build system. Shell plus markdown, on purpose.
+
+## Scope — deliberately narrow
+
+This is one person's roll, for one person's machines.
+
+- **Not a distribution or a framework.** No plugin system, no config schema, no versioning story.
+- **Not exhaustive.** It carries the knives I actually reach for. Missing features are not bugs.
+- **Not a replacement for anything.** Not for dotfiles, not for a package manager, not for distro
+  tooling, not for another person's setup — it sits beside them.
+- **Not a product.** Nobody else's workflow has to fit it, and it should not be grown to fit one.
+
+Where a tool ships its own installer, Saya calls it instead of reimplementing it. The repo stays
+small precisely because it refuses the above.
