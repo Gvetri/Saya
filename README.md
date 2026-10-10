@@ -26,12 +26,23 @@ This is a **personal** roll, for my own machines — not a distribution and not 
 | `scripts/` | the logic; small, one job per knife |
 | `skills/` | agent skills — instructions, not libraries |
 
-## Unpack
+## Install, then unpack
+
+Install the skill into your agent (the CLI knows Hermes as `hermes-agent`):
 
 ```sh
-scripts/unpack.sh android           # plan: prints what would be installed
-scripts/unpack.sh android --apply   # do it
+npx skills add Gvetri/Saya -g -a hermes-agent      # also: -a codex -a pi -a cursor
 ```
+
+Then, in the agent, ask it to **unpack** a rack — it fetches the roll and runs the plan:
+
+```sh
+~/.saya/scripts/unpack.sh android           # plan: prints what would be installed
+~/.saya/scripts/unpack.sh android --apply   # do it
+```
+
+The skill itself is thin on purpose: it downloads the roll (`git clone` → `~/.saya`) and then
+runs the script from there, so the racks and the script stay a single source of truth.
 
 Today there is one rack — **`android`**: sdkman, Temurin JDK 21, the Android CLI
 (cmdline-tools 23.0) + SDK, and Maestro.

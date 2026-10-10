@@ -11,8 +11,21 @@ markdown — nothing to build, no dependencies of its own.
 
 1. `README.md` for the layout, `CONTEXT.md` for why.
 2. Pick the rack in `racks/` for that host (today: `android`).
-3. Follow `skills/unpack/SKILL.md`: plan, get a yes, then `--apply`.
+3. Follow `skills/unpack/SKILL.md`: fetch the roll, plan, get a yes, then `--apply`.
 4. `scripts/unpack.sh` is the only executable logic, and it is a **dry-run by default**.
+
+## Distribution
+
+The skill is installed with the open `skills` CLI (npx), which supports Hermes as
+`hermes-agent`, plus Codex, Pi, Cursor, Claude Code and others:
+
+```sh
+npx skills add Gvetri/Saya -g -a hermes-agent
+```
+
+The installed skill carries **no scripts**. It bootstraps: it clones this repo to `~/.saya`
+(or `$SAYA_DIR`) and runs `scripts/unpack.sh` from there — so the racks and the script have one
+source of truth and never drift from a copy.
 
 ## Conventions
 

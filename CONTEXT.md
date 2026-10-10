@@ -27,6 +27,10 @@ skills/    what an agent should know    (instructions)
   *sourced*, so the shell is the parser — no parser dependency, no parsing code, and a rack can
   carry its own versions/packages. The trade-off: a rack is executable, so keep it to declarations
   and only run racks you trust.
+- **Distributed as a skill, not a bundle.** `npx skills add Gvetri/Saya -g -a hermes-agent`
+  installs only `skills/unpack/SKILL.md`. The skill deliberately carries no scripts: it clones the
+  repo to `~/.saya` and runs `scripts/unpack.sh` from the clone, so there is exactly one copy of
+  the logic and the racks. Bundling a second copy inside the skill would drift.
 - **Order matters.** In a rack, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
   installer needs a JDK on PATH.
 - **Android CLI, not `sdkmanager`.** cmdline-tools 23.0 ships a new `android` binary and marks
