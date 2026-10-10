@@ -29,5 +29,6 @@ markdown — nothing to build, no dependencies of its own.
 ## Adding a knife
 
 1. Add `knife_<name>()` to `scripts/unpack.sh`.
-2. Add `<name>` to the relevant `racks/<rack>.txt`.
+2. Add `<name>` to the relevant `racks/<rack>.conf`, and declare anything it needs there
+   (`knives=(...)` is the only required entry; versions/packages belong in the rack, not the script).
 3. Note anything host-specific under `CONTEXT.md` → Decisions.

@@ -8,7 +8,7 @@ the sheath travels. This repo ships the knives, and a **set** is the subset a gi
 ## Shape
 
 ```
-racks/     the knives kept out, per host (data)
+racks/     the knives kept out, per host (shell-native)
 scripts/   how to unpack it             (logic)
 skills/    what an agent should know    (instructions)
 *.md       entry point, context, vocabulary
@@ -23,6 +23,10 @@ skills/    what an agent should know    (instructions)
 - **The SDK lives outside the repo.** `ANDROID_HOME` defaults to `~/Android/Sdk`. Nothing large
   is ever committed here.
 - **Dry-run by default.** The script prints the plan; `--apply` is the explicit second step.
+- **Racks are shell-native.** `racks/<rack>.conf` is a shell file declaring `knives=(...)`; it is
+  *sourced*, so the shell is the parser — no parser dependency, no parsing code, and a rack can
+  carry its own versions/packages. The trade-off: a rack is executable, so keep it to declarations
+  and only run racks you trust.
 - **Order matters.** In a rack, `sdkman` → `temurin-21` → `android-cli` → `maestro`: the SDK
   installer needs a JDK on PATH.
 
