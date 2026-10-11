@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-# Saya — unpack a rack of knives onto this host.
-#
-#   scripts/unpack.sh <rack>            plan only (default): prints what would run
-#   scripts/unpack.sh <rack> --apply    actually install
-#
-# A rack is racks/<rack>.conf — a small shell file declaring `knives=(...)`.
-# The shell is the parser: the rack is sourced, so there is no parser dependency
-# and no parsing code here.
 set -euo pipefail
 
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -28,25 +20,17 @@ RACK_FILE="$RACKS_DIR/$RACK.conf"
 
 log()  { printf '%s\n' "$*"; }
 step() { log "    \$ $*"; }
-# Dry-run is a no-op; under --apply a failure must reach `set -e`. (The old
-# `"$@" || return 0` swallowed it, so the rack could report "done." with exit 0 after a knife failed.)
 sh_()  { if [ "$APPLY" = "true" ]; then "$@"; else return 0; fi; }
 
-# ---- the rack --------------------------------------------------------------
-# Defaults — a rack may override any of these by declaring them.
 knives=()
 prereqs=()
 temurin_version="21.0.12-tem"
-android_cmdline_tools="16111833"                                            # cmdline-tools 23.0
-android_packages=(platform-tools platforms/android-35 build-tools/35.0.0)   # new Android CLI syntax
+android_cmdline_tools="16111833"
+android_packages=(platform-tools platforms/android-35 build-tools/35.0.0)
 
-# shellcheck source=/dev/null
 source "$RACK_FILE"
 
 [ "${#knives[@]}" -gt 0 ] || { echo "rack '$RACK' declares no knives" >&2; exit 2; }
-
-# ---- knives ----------------------------------------------------------------
-# One small, idempotent installer per tool. Keep them short and readable.
 
 knife_sdkman() {
   step "curl -sSL https://get.sdkman.io | bash"
@@ -78,15 +62,11 @@ knife_android_cli() {
 
 knife_maestro() {
   step "curl -Ls https://get.maestro.mobile.dev | bash"
-  # sdkman's init is not in this process, so the installer would not find the JDK it needs.
   sh_ bash -c 'source "$HOME/.sdkman/bin/sdkman-init.sh"; curl -Ls https://get.maestro.mobile.dev | bash'
 }
 
-# ---- runner ----------------------------------------------------------------
 log "rack: $RACK  [$([ "$APPLY" = true ] && echo apply || echo plan)]"
 log ""
-# The rack declares what it needs but does not install; naming it here beats a knife dying
-# halfway through with its own error. A missing one only blocks --apply.
 missing=()
 for p in "${prereqs[@]}"; do command -v "$p" >/dev/null 2>&1 || missing+=("$p"); done
 if [ "${#missing[@]}" -gt 0 ]; then

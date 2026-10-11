@@ -21,26 +21,29 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    ```sh
    export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
    export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
-   export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.android/avd}"   # pin it — see step 3
-   export MAESTRO_CLI_NO_ANALYTICS=1                                  # the kitchen reports to nobody
+   export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.android/avd}"
+   export MAESTRO_CLI_NO_ANALYTICS=1
    export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$HOME/.maestro/bin:$PATH"
    java -version && maestro --version && android info
    ```
 
    `android info` naming the SDK path is the check that passes. Anything missing means the rack is not
-   unpacked yet — `skills/unpack`, rack `android`.
+   unpacked yet — `skills/unpack`, rack `android`. Two of those exports are the non-obvious ones:
+   `ANDROID_AVD_HOME` puts both Android tools on one AVD home (step 3 says why), and
+   `MAESTRO_CLI_NO_ANALYTICS` keeps Maestro from reporting the run anywhere.
 
 2. **Pick the image, with the user.** Default `android-34` — the Cloud-equivalent, and a level this
    CLI supports. Offer it, show what else is available, and wait for the choice:
 
    ```sh
-   maestro list-devices                            # levels this CLI can create
-   android sdk list --all | grep 'system-images'   # images this SDK can install
+   maestro list-devices
+   android sdk list --all | grep 'system-images'
    ```
 
-   The level is the only knob: the tag stays `google_apis` (never `google_apis_playstore` — Google
-   APIs is what Maestro Cloud reproduces locally) and the ABI stays `x86_64` (this host's CPU). Then
-   plan first, then apply; the image is ~1.6 GB:
+   `list-devices` names the levels this CLI can create; `android sdk list --all` names the images this
+   SDK can install. The level is the only knob: the tag stays `google_apis` (never
+   `google_apis_playstore` — Google APIs is what Maestro Cloud reproduces locally) and the ABI stays
+   `x86_64` (this host's CPU). Then plan first, then apply; the image is ~1.6 GB:
 
    ```sh
    android sdk install emulator system-images/android-34/google_apis/x86_64
@@ -56,17 +59,17 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
 3. **Create or reuse this agent's device.** Named for the agent, so agents never share one:
 
    ```sh
-   device="<agent>-api34"                          # one name per agent — see Rules
+   device="<agent>-api34"
    mkdir -p "$ANDROID_AVD_HOME"
    avdmanager list avd | grep -q "Name: $device" || echo no | avdmanager create avd \
        --name "$device" \
        --package "system-images;android-34;google_apis;x86_64" \
        --device pixel_6
-   emulator -list-avds | grep -qx "$device"        # the two tools must agree, or nothing boots
+   emulator -list-avds | grep -qx "$device"
    "$ANDROID_HOME/emulator/emulator" -avd "$device" \
        -no-window -no-snapshot -no-audio -no-boot-anim -no-metrics -accel on \
        > "${TMPDIR:-/tmp}/$device-emulator.log" 2>&1 &
-   for _ in $(seq 1 100); do                       # bounded: a dead emulator must not hang the run
+   for _ in $(seq 1 100); do
      [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
      sleep 3
    done
@@ -75,22 +78,23 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    done | head -1)"; echo "$serial"
    ```
 
+   The name is the agent's own: `maestro start-device` would derive one from model and level and reuse
+   it, so several agents on one kitchen land on a single emulator — and a wipe would take out a device
+   its own agent did not create.
+
    **`ANDROID_AVD_HOME` is not optional.** `avdmanager` is a Java tool and honours `XDG_CONFIG_HOME`,
    so on a host where that is set it writes the AVD to `~/.config/.android/avd` — while the emulator
    binary searches only `$ANDROID_AVD_HOME`, `$ANDROID_SDK_HOME/avd` and `$HOME/.android/avd`, finds
    nothing, and exits with `Unknown AVD name`. Pinning the home puts both tools on one directory; the
    `emulator -list-avds` line is the check that they really do.
 
-   `maestro start-device` is deliberately not used here: it names the AVD after the model and level
-   and reuses any AVD of that name, so several agents on one kitchen would all land on one emulator —
-   and a wipe would delete another agent's device. A name of our own is what makes the device yours.
-
    Headless is the default because the agent drives the device through adb and Maestro Viewer, and a
    window is something the human can grab, nudge or block by accident. Drop `-no-window` (keep the
    rest) when the user asks to watch it run. No `-gpu` value is pinned: the emulator picks its own back
    end, so a kitchen with a working GPU gets the GPU. Where the terminal tool tracks background
-   processes, start it as one — the emulator never exits by itself, and a boot that never finishes
-   leaves its reason in `$TMPDIR/<device>-emulator.log`.
+   processes, start it as one — the emulator never exits by itself — and the boot wait is bounded, so a
+   dead emulator fails the run instead of hanging it, with its reason in
+   `$TMPDIR/<device>-emulator.log`.
 
    Done when `adb -s "$serial" emu avd name` prints `$device` — its output carries a trailing CR, so
    strip it. Safe to re-run: an existing AVD is reused, and a booted device is left alone.
@@ -100,19 +104,19 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
 
    ```sh
    probe="$(mktemp -d)" && echo "$probe"
-   ( cd "$probe" && maestro download-samples )   # writes $probe/samples/
+   ( cd "$probe" && maestro download-samples )
    adb -s "$serial" install -r "$probe/samples/wikipedia.apk"
    ( cd "$probe" && maestro --device "$serial" test \
        --test-output-dir "$probe/report" --debug-output "$probe/logs" \
        samples/android-flow.yaml )
    ```
 
-   One `download-samples` gives both halves: the app (`samples/wikipedia.apk`, `appId: org.wikipedia`)
-   and a `launchApp` smoke flow, plus an `advanced`-tagged flow for a deeper check. It fetches both
-   platforms — ~200 MB, an 82 MB Android APK and a 117 MB iOS bundle — so the probe is the only place
-   that weight ever lands, and every setup run pays it again. The output flags keep Maestro's own
-   artifacts — session log, and on a failure screenshots and screen hierarchy — inside the probe
-   instead of `~/.maestro/tests`.
+   One `download-samples` writes `samples/` and gives both halves: the app
+   (`samples/wikipedia.apk`, `appId: org.wikipedia`) and a `launchApp` smoke flow, plus an
+   `advanced`-tagged flow for a deeper check. It fetches both platforms — ~200 MB, an 82 MB Android APK
+   and a 117 MB iOS bundle — so the probe is the only place that weight ever lands, and every setup run
+   pays it again. The output flags keep Maestro's own artifacts — session log, and on a failure
+   screenshots and screen hierarchy — inside the probe instead of `~/.maestro/tests`.
 
    Green is this skill's completion criterion, and it proves four links at once: the emulator booted,
    the driver installed, the app launched, and Maestro is driving the same device the MCP will see.
@@ -138,7 +142,7 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    ```yaml
    mcp_servers:
      maestro:
-       command: "/home/<you>/.maestro/bin/maestro"        # absolute: agent shells have a thin PATH
+       command: "/home/<you>/.maestro/bin/maestro"
        args: ["mcp"]
        env:
          JAVA_HOME: "/home/<you>/.sdkman/candidates/java/current"
@@ -146,10 +150,11 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    ```
 
    Hermes reads `~/.hermes/config.yaml`, Codex the same block as `[mcp_servers.maestro]` in
-   `~/.codex/config.toml`. Agents launch MCP servers with a filtered environment, so `JAVA_HOME`
-   belongs in that block even though your own shell has it. Connections are read at startup — restart
-   the agent to pick it up. The server logs `mcp_viewer_ready` with a local URL for whoever wants to
-   watch, and it drives the device this skill just provisioned.
+   `~/.codex/config.toml`. Agents launch MCP servers with a filtered environment, so `JAVA_HOME`,
+   `MAESTRO_CLI_NO_ANALYTICS` and an absolute path to the binary belong in that block even though your
+   own shell has them. Connections are read at startup — restart the agent to pick it up. The server
+   logs `mcp_viewer_ready` with a local URL for whoever wants to watch, and it drives the device this
+   skill just provisioned.
 
    Kitchen facts to report: the device name and its image, the sample `appId` (`org.wikipedia`,
    re-derivable with `adb shell pm list packages`), and that step 3 — not `maestro start-device` — is
