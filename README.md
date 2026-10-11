@@ -28,10 +28,11 @@ This is a **personal** roll, for my own machines — not a distribution and not 
 
 ## Install, then unpack
 
-Install the skill into your agent (the CLI knows Hermes as `hermes-agent`):
+Install the skill into your agent — the CLI knows Hermes as `hermes-agent`, and also handles codex,
+pi and cursor:
 
 ```sh
-npx skills add Gvetri/Saya -g -a hermes-agent      # also: -a codex -a pi -a cursor
+npx skills add Gvetri/Saya -g -a hermes-agent
 ```
 
 Then, in the agent, ask it to **unpack** a rack. The skill fetches the roll into a temp dir, runs
@@ -51,6 +52,16 @@ A rack is `racks/<name>.conf`: a tiny shell file declaring `knives=(...)` (plus 
 packages it needs). It is *sourced*, so the shell itself is the parser — no parser to install,
 no parsing code, nothing reinvented.
 
-## Status
+## Skills
 
-Early. Android rack only.
+Skills split on one axis: who can invoke them. **Model-invoked** skills carry a description, so the
+agent reaches for one when the task fits — and you can still type its name yourself. **User-invoked**
+skills are reachable only when you type them, and they orchestrate: one may invoke a model-invoked
+skill, never another user-invoked one.
+
+### Android
+
+Getting a host ready to build and drive Android apps.
+
+- **unpack**: Fetch the roll, show the plan for a rack, install its knives only after a yes, then delete the clone.
+- **maestro-setup**: Give an agent a live Android device for Maestro MCP — pick the image with the user, boot a headless AVD named for that agent, prove the chain with a throwaway sample app, wire the MCP, then stop the device.
