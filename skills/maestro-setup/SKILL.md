@@ -43,11 +43,15 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    `list-devices` names the levels this CLI can create; `android sdk list --all` names the images this
    SDK can install. The level is the only knob: the tag stays `google_apis` (never
    `google_apis_playstore` — Google APIs is what Maestro Cloud reproduces locally) and the ABI stays
-   `x86_64` (this host's CPU). Then plan first, then apply; the image is ~1.6 GB:
+   `x86_64` (this host's CPU). Then install it — the image is ~1.6 GB, and installing one that is
+   already there is a no-op:
 
    ```sh
    android sdk install emulator system-images/android-34/google_apis/x86_64
    ```
+
+   `android sdk install` prints nothing when the packages are present, so `android sdk list` — which
+   prints what is installed — is how a silent run is told apart from a real install.
 
    One image, two syntaxes: the `android` CLI takes slash paths, while `avdmanager` and `--device-os`
    take the `;`-separated form (`system-images;android-34;google_apis;x86_64`).
@@ -86,15 +90,16 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    so on a host where that is set it writes the AVD to `~/.config/.android/avd` — while the emulator
    binary searches only `$ANDROID_AVD_HOME`, `$ANDROID_SDK_HOME/avd` and `$HOME/.android/avd`, finds
    nothing, and exits with `Unknown AVD name`. Pinning the home puts both tools on one directory; the
-   `emulator -list-avds` line is the check that they really do.
+   `emulator -list-avds` line is the check that they really do. Only that create branch needs the pin —
+   a host that already has the AVD reuses it and never exercises the split.
 
    Headless is the default because the agent drives the device through adb and Maestro Viewer, and a
    window is something the human can grab, nudge or block by accident. Drop `-no-window` (keep the
    rest) when the user asks to watch it run. No `-gpu` value is pinned: the emulator picks its own back
    end, so a kitchen with a working GPU gets the GPU. Where the terminal tool tracks background
-   processes, start it as one — the emulator never exits by itself — and the boot wait is bounded, so a
-   dead emulator fails the run instead of hanging it, with its reason in
-   `$TMPDIR/<device>-emulator.log`.
+   processes, hand it that job rather than relying on the `&` — the emulator never exits by itself —
+   and the boot wait is bounded, so a dead emulator fails the run instead of hanging it, with its
+   reason in `$TMPDIR/<device>-emulator.log`.
 
    Done when `adb -s "$serial" emu avd name` prints `$device` — its output carries a trailing CR, so
    strip it. Safe to re-run: an existing AVD is reused, and a booted device is left alone.
@@ -125,17 +130,20 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
 5. **Clear the probe and stop the device.** The kitchen goes cold, the AVD stays:
 
    ```sh
+   test -d "$probe/report" && echo "the run's artifacts stayed in the probe"
    rm -rf "$probe"
    adb -s "$serial" emu kill
    adb devices
    ```
 
-   Done when this agent's emulator is gone from `adb devices`, the probe is gone, and this run added
-   nothing under `~/.maestro/tests`. **Stopping is not wiping**: the AVD survives with the sample app
-   inside it, and Maestro installs and removes its own driver APKs around each run, so nothing of that
-   run stays on the device. Booting again is step 3; the wipe is `avdmanager delete avd --name
-   <device>` — it belongs to whoever created that device for a feature, and it is how an agent retires
-   its emulator once its PR has merged.
+   Done when that `test` found the run's report inside the probe — which is what says the output flags
+   worked, where `~/.maestro/tests` merely being absent says nothing, since on a host that never
+   writes there it is absent either way — the probe is gone, and this agent's emulator is gone from
+   `adb devices`. **Stopping is not wiping**: the AVD survives with the sample app inside it, and
+   Maestro installs and removes its own driver APKs around each run, so nothing of that run stays on
+   the device. Booting again is step 3; the wipe is `avdmanager delete avd --name <device>` — it
+   belongs to whoever created that device for a feature, and it is how an agent retires its emulator
+   once its PR has merged.
 
 6. **Hand off the kitchen.** Give the agent the MCP block for its own config:
 
@@ -149,12 +157,14 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
          MAESTRO_CLI_NO_ANALYTICS: "1"
    ```
 
-   Hermes reads `~/.hermes/config.yaml`, Codex the same block as `[mcp_servers.maestro]` in
-   `~/.codex/config.toml`. Agents launch MCP servers with a filtered environment, so `JAVA_HOME`,
-   `MAESTRO_CLI_NO_ANALYTICS` and an absolute path to the binary belong in that block even though your
-   own shell has them. Connections are read at startup — restart the agent to pick it up. For whoever
-   wants to watch, the server logs `mcp_viewer_ready` with a local Viewer URL and prefixes every tool
-   result with that same link — hand it to the user; it drives the device this skill provisioned.
+   Hermes reads its config at `$HERMES_HOME/config.yaml` — `~/.hermes/config.yaml` with no profile,
+   `~/.hermes/profiles/<name>/config.yaml` under one, which is this agent's own file — and Codex takes
+   the same block as `[mcp_servers.maestro]` in `~/.codex/config.toml`. Agents launch MCP servers with
+   a filtered environment, so `JAVA_HOME`, `MAESTRO_CLI_NO_ANALYTICS` and an absolute path to the
+   binary belong in that block even though your own shell has them. Connections are read at startup —
+   restart the agent to pick it up. For whoever wants to watch, the server logs `mcp_viewer_ready` with
+   a local Viewer URL and prefixes every tool result with that same link — hand it to the user; it
+   drives the device this skill provisioned.
 
    Kitchen facts to report: the device name and its image, the sample `appId` (`org.wikipedia`,
    re-derivable with `adb shell pm list packages`), and that step 3 — not `maestro start-device` — is
