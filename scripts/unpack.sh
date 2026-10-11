@@ -47,6 +47,7 @@ knife_android_cli() {
   local url="https://dl.google.com/android/repository/commandlinetools-linux-${android_cmdline_tools}_latest.zip"
   step "cmdline-tools ${android_cmdline_tools} -> $root/cmdline-tools/latest"
   step "android sdk install ${android_packages[*]}"
+  step "android sdk list"
   sh_ bash -euo pipefail -c '
     root="$1"; url="$2"; shift 2; packages=("$@"); tmp="$(mktemp -d)"
     mkdir -p "$root/cmdline-tools"
@@ -56,6 +57,7 @@ knife_android_cli() {
     mv "$tmp/cmdline-tools" "$root/cmdline-tools/latest"
     android="$root/cmdline-tools/latest/bin/android"
     "$android" --sdk="$root" sdk install "${packages[@]}"
+    "$android" --sdk="$root" sdk list
     rm -rf "$tmp"
   ' _ "$root" "$url" "${android_packages[@]}"
 }
