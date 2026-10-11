@@ -43,6 +43,10 @@ skills/    what an agent should know    (instructions)
   *every* agent's skills directory (`~/.hermes`, `~/.codex`, `~/.cursor`, `~/.pi`, …) and ignores
   `HOME`, so it cannot be sandboxed or dry-run. Run it by hand, on purpose, if the skill is wanted.
 
+- **Racks carry the toolchain; skills carry the workflow.** A rack holds what every host of that kind
+  needs. Heavy, device-scoped setup — an emulator image, a virtual device, a browser bundle — belongs
+  to the skill that needs it and is provisioned on demand, so a host pays for it only if it uses it.
+
 ## Not here
 
 No CI, no tests, no build system. Shell plus markdown, on purpose.

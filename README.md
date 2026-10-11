@@ -53,4 +53,6 @@ no parsing code, nothing reinvented.
 
 ## Status
 
-Early. Android rack only.
+Early. One rack — `android` — and two skills: `unpack`, which runs a rack on a host, and
+`maestro-setup`, which provisions an Android device for an agent to drive with Maestro MCP, proves it
+with a throwaway sample app, and stops it again.
