@@ -65,3 +65,4 @@ Getting a host ready to build and drive Android apps.
 
 - **unpack**: Fetch the roll, show the plan for a rack, install its knives only after a yes, then delete the clone.
 - **maestro-setup**: Give an agent a live Android device for Maestro MCP — pick the image with the user, boot a headless AVD named for that agent, prove the chain with a throwaway sample app, wire the MCP, then stop the device.
+- **maestro-test**: Prove a change end to end on Android — see the live screen, author the flow, run it until it is green, and leave the YAML behind as the test. Runs on the agent's own device.
