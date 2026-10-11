@@ -31,7 +31,8 @@ every run re-downloads the roll.
    ```sh
    export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
    export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
-   export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+   export MAESTRO_CLI_NO_ANALYTICS=1
+   export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$HOME/.maestro/bin:$PATH"
    java -version && android sdk list && maestro --version
    ```
 

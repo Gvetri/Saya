@@ -33,16 +33,18 @@ step 5 stops and wipes it — this skill runs those commands and decides when.
    inline `{ yaml }` to move around and change state, `cheat_sheet` before commands you have not used,
    `inspect_screen` to see what a screen actually holds, `take_screenshot` when a visual would help.
    Explore freely and keep nothing yet. Two things about what comes back: every tool result is prefixed
-   with a Maestro Viewer banner line before its payload, and the hierarchy is abbreviated — read the
-   `abbreviations` map it sends (text, resource id, content description, `hint` for a placeholder, …)
-   rather than the field names you expect, and never mistake the schema header for a list of elements.
+   with a Maestro Viewer banner line before its payload, and the hierarchy arrives as two top-level
+   keys — `ui_schema`, whose `abbreviations` map renames every field (`txt` text, `rid` resource id,
+   `a11y` content description, `hint` a placeholder), and `elements`, its sibling and never its child.
+   Read the map rather than the field names you expect.
    Done when the change works on the device and you hold, in context, the elements every screen on the
    journey offers.
 
 4. **Write the flow from the hierarchies you gathered.** One flow, in YAML, saved as
-   `.maestro/<flow>.yaml` in the repo that owns the app — the kitchen that drove it is not that repo,
-   and an app with no repo here keeps the flow in the agent's own workspace. `appId` first, then
-   `launchApp`, then the journey you just walked, with strings **copied** from the hierarchies rather
+   `.maestro/<flow>.yaml` in the repo that owns the app — the kitchen that drove it is not that repo —
+   and an app with no repo here keeps the flow somewhere that outlives the session (`~/.maestro/` will
+   do), never in a scratch directory the host prunes. `appId` first, then `launchApp`, then the journey
+   you just walked, with strings **copied** from the hierarchies rather
    than retyped. Leave the values that change per run out of the assertions — wall-clock times, counts,
    list order, generated ids — while stable resource-ids stay the durable selectors they are. Done when
    the file asserts the outcome from step 2.
