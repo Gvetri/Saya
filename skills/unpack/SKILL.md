@@ -46,6 +46,8 @@ every run re-downloads the roll.
 - **Never edit inside the clone** — it is deleted by design; rack changes belong in the repo.
 - Never guess a version — `sdk list java` and `android sdk list` confirm the exact id before
   pinning one.
-- `git`, `curl` and `unzip` are prerequisites the rack does not install.
+- **Prerequisites are declared, not installed.** A rack lists what it needs in `prereqs=(...)`;
+  unpack names the ones that are missing rather than installing them — the package manager is the
+  host's. `git` is the one the unpack flow itself needs, to fetch the roll.
 - A rack is *sourced*, so it is code — unpack only racks you trust.
 - Adding a knife = one `knife_<name>()` in `scripts/unpack.sh` plus a line in `racks/<rack>.conf`.

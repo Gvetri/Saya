@@ -28,11 +28,14 @@ RACK_FILE="$RACKS_DIR/$RACK.conf"
 
 log()  { printf '%s\n' "$*"; }
 step() { log "    \$ $*"; }
-sh_()  { [ "$APPLY" = "true" ] && "$@" || return 0; }   # dry-run: print only
+# Dry-run is a no-op; under --apply a failure must reach `set -e`. (The old
+# `"$@" || return 0` swallowed it, so the rack could report "done." with exit 0 after a knife failed.)
+sh_()  { if [ "$APPLY" = "true" ]; then "$@"; else return 0; fi; }
 
 # ---- the rack --------------------------------------------------------------
 # Defaults — a rack may override any of these by declaring them.
 knives=()
+prereqs=()
 temurin_version="21.0.12-tem"
 android_cmdline_tools="16111833"                                            # cmdline-tools 23.0
 android_packages=(platform-tools platforms/android-35 build-tools/35.0.0)   # new Android CLI syntax
@@ -75,12 +78,21 @@ knife_android_cli() {
 
 knife_maestro() {
   step "curl -Ls https://get.maestro.mobile.dev | bash"
-  sh_ bash -c 'curl -Ls https://get.maestro.mobile.dev | bash'
+  # sdkman's init is not in this process, so the installer would not find the JDK it needs.
+  sh_ bash -c 'source "$HOME/.sdkman/bin/sdkman-init.sh"; curl -Ls https://get.maestro.mobile.dev | bash'
 }
 
 # ---- runner ----------------------------------------------------------------
 log "rack: $RACK  [$([ "$APPLY" = true ] && echo apply || echo plan)]"
 log ""
+# The rack declares what it needs but does not install; naming it here beats a knife dying
+# halfway through with its own error. A missing one only blocks --apply.
+missing=()
+for p in "${prereqs[@]}"; do command -v "$p" >/dev/null 2>&1 || missing+=("$p"); done
+if [ "${#missing[@]}" -gt 0 ]; then
+  log "! prerequisite(s) not installed: ${missing[*]}"
+  [ "$APPLY" = "true" ] && { log "  install them, then re-run --apply."; exit 4; }
+fi
 for knife in "${knives[@]}"; do
   fn="knife_${knife//-/_}"
   declare -F "$fn" >/dev/null || { echo "! no installer for '$knife'" >&2; exit 3; }
