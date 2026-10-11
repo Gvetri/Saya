@@ -152,9 +152,9 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
    Hermes reads `~/.hermes/config.yaml`, Codex the same block as `[mcp_servers.maestro]` in
    `~/.codex/config.toml`. Agents launch MCP servers with a filtered environment, so `JAVA_HOME`,
    `MAESTRO_CLI_NO_ANALYTICS` and an absolute path to the binary belong in that block even though your
-   own shell has them. Connections are read at startup — restart the agent to pick it up. The server
-   logs `mcp_viewer_ready` with a local URL for whoever wants to watch, and it drives the device this
-   skill just provisioned.
+   own shell has them. Connections are read at startup — restart the agent to pick it up. For whoever
+   wants to watch, the server logs `mcp_viewer_ready` with a local Viewer URL and prefixes every tool
+   result with that same link — hand it to the user; it drives the device this skill provisioned.
 
    Kitchen facts to report: the device name and its image, the sample `appId` (`org.wikipedia`,
    re-derivable with `adb shell pm list packages`), and that step 3 — not `maestro start-device` — is
@@ -166,8 +166,7 @@ the per-agent device it makes for a feature, then wipes that one after the PR me
   emulator and overwrite each other's state, and a wipe takes out a device it does not own. Name yours,
   boot yours, wipe yours.
 - **Target your serial.** With several agents' devices up, pass `--device <serial>` to Maestro and
-  `-s <serial>` to adb on every command; the MCP hands out the same ids through `list_devices` and its
-  local tools refuse to run without one. `adb -s <serial> emu avd name` says which AVD a serial is.
+  `-s <serial>` to adb on every command. `adb -s <serial> emu avd name` says which AVD a serial is.
 - **Headless unless asked.** The window belongs to the human and is theirs to nudge; the agent's view
   is Maestro Viewer. A run goes windowed only when the user asks for it — dropping `-no-window` and
   keeping the rest of the flags.
