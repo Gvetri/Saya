@@ -83,8 +83,9 @@ The auditor's whole leash. Hand it over verbatim, judge against it, add nothing 
   the symbol to rename or extract so the surprise reads.
 - **A comment a tool reads** — a folding marker, a suppression directive, a formatter's off switch, a build
   tag. It survives only while the rule it silences is faulty, pedantic or style-only.
-- **A doc comment that defines a published API contract** — parameters, return, what it throws, an example. One
-  that only restates the signature is narration, and narration dies.
+- **The doc comment that defines a published API contract** — KDoc, Javadoc, JSDoc or TSDoc, rustdoc, a Python
+  docstring, a Go doc comment. Parameters, return, what it throws and an example are the contract, so they
+  stay; a doc that only restates the signature is narration, and narration dies.
 - **A link that says what code cannot** — an issue in the tracker, an RFC, a platform or vendor policy page.
   The link stays; the prose wrapped around it does not.
 - **Certainty, or death.** When a clause is not clearly true of this comment, the comment dies.

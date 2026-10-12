@@ -43,6 +43,7 @@ stack's words are.
   stops being a comment and becomes a check; ktlint's `.editorconfig`. All wired into `./gradlew check`.
 - **A test.** JUnit or Robolectric, a Compose UI test, or a Maestro flow — `maestro-test` is the roll's own
   route to a flow that drives the app, and it is the strongest proof of a UI claim.
-- **KDoc.** A contract on a published module's API: parameters, return, what it throws, a `@sample`. In an app
-  module nothing outside consumes, a doc that restates the signature is narration — and detekt's own comments
-  ruleset already treats docs over private code as the smell it is.
+- **The doc comment**, KDoc in Kotlin and Javadoc in Java. A contract on a published module's API: parameters,
+  return, what it throws, a `@sample`. In an app module nothing outside consumes, a doc that restates the
+  signature is narration — and detekt's own comments ruleset already treats docs over private code as the
+  smell it is.
