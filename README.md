@@ -67,6 +67,12 @@ Getting a host ready to build and drive Android apps.
 - **maestro-setup**: Give an agent a live Android device for Maestro MCP — pick the image with the user, boot a headless AVD named for that agent, prove the chain with a throwaway sample app, wire the MCP, then stop the device.
 - **maestro-test**: Prove a change end to end on Android — see the live screen, author the flow, run it until it is green, and leave the YAML behind as the test. Runs on the agent's own device.
 
+### Work
+
+Picking earlier work back up, whatever the stack and wherever the work is tracked.
+
+- **pickup** (typed): Rebuild what an earlier session did, then check it against the current state of the task and the code, so nothing carries over stale.
+
 ### Code
 
 The code a kitchen works on, whatever the stack.
