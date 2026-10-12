@@ -29,10 +29,10 @@ roll has written that vocabulary down it sits in a file beside this one — `ref
 
    Reviewing someone else's PR, `gh pr checkout <number>` first, so the tree holds the revision under review.
    With no PR on the branch, or no CLI on the host, the same list comes off the base branch —
-   `git diff --name-only <base>...HEAD`. Only a human widens it, and the ask names the width: a path (a
-   module) or the repo (`git ls-files`). Fence off what no human wrote — build and generated output, vendored
-   dependencies, lockfiles, binaries. Done when the report's first line names the list and where it came from,
-   minus what the fence kept out.
+   `git diff --name-only <base>...HEAD`, `<base>` being the repo's default branch (usually `main`). Only a human
+   widens it, and the ask names the width: a path (a module) or the repo (`git ls-files`). Fence off what no
+   human wrote — build and generated output, vendored dependencies, lockfiles, binaries. Done when the report's
+   first line names the list and where it came from, minus what the fence kept out.
 
 2. **Send in the auditor.** One read-only subagent — `comment-sicko` (Hermes: `delegate_task`) — whose whole
    brief is the scope, the fence, *What survives* and the stack file beside this one, handed over verbatim
