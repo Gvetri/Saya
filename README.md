@@ -61,9 +61,14 @@ skill, never another user-invoked one.
 
 ### Android
 
-Getting a host ready to build and drive Android apps, and the Android code that comes out of one.
+Getting a host ready to build and drive Android apps.
 
 - **unpack**: Fetch the roll, show the plan for a rack, install its knives only after a yes, then delete the clone.
 - **maestro-setup**: Give an agent a live Android device for Maestro MCP — pick the image with the user, boot a headless AVD named for that agent, prove the chain with a throwaway sample app, wire the MCP, then stop the device.
 - **maestro-test**: Prove a change end to end on Android — see the live screen, author the flow, run it until it is green, and leave the YAML behind as the test. Runs on the agent's own device.
-- **no-comments** (typed): Sweep the Android code you are working on for explanatory comments — a read-only auditor reports every kill and keep, the accepted kills go at the root cause, and every claimed constraint ends as a check or as open work.
+
+### Code
+
+The code a kitchen works on, whatever the stack.
+
+- **no-comments** (typed): Sweep the repo you are working on for explanatory comments — a read-only auditor reports every kill and keep, the accepted kills go at the root cause, and every claimed constraint ends as a check or as open work.
