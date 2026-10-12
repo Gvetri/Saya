@@ -1,14 +1,15 @@
 ---
 name: no-comments
-description: Sweep the repo you are working on for explanatory comments — a read-only auditor reports every kill and keep, the accepted kills are deleted at the root cause, and every claimed constraint ends as a check or as open work.
+description: Sweep the files a pull request touches for explanatory comments — a read-only auditor reports every kill and keep, the accepted kills are deleted at the root cause, and every claimed constraint ends as a check or as open work.
 disable-model-invocation: true
 ---
 
 # no-comments
 
 A comment is prose standing where a name, a type or a test belongs. Inside the roll that is already settled;
-this skill carries the rule into **the code a kitchen works on** — any repo, any stack — and leaves the
-roll's own files to the conventions they already carry.
+this skill carries the rule into **the code a kitchen works on** — any repo, any stack — and it sweeps what a
+review is already looking at: **the pull request**, the current branch's changed files, wider only when a
+human asks. The roll's own files keep the conventions they already carry.
 
 The agent that wrote a comment is the wrong pair of eyes to judge it: the reason arrives attached, already
 believed. So the sweep runs on a subagent with no stake in the code and exactly one leash, *What survives*
@@ -19,10 +20,19 @@ roll has written that vocabulary down it sits in a file beside this one — `ref
 
 ## Do this
 
-1. **Fix the scope.** The caller's files or diff; with none, the diff against the repo's base branch (default
-   `main`), working tree included. Fence off what nobody edits by hand — build and generated output, vendored
-   dependencies, lockfiles, anything a tool rewrites. Done when the report's first line names every file the
-   sweep may touch, and what the fence kept out.
+1. **Fix the scope — the PR, unless a human widened it.** The current branch's pull request answers with its
+   own file list, deletions aside:
+
+   ```sh
+   gh pr view --json url,files --jq '.url, (.files[] | select(.changeType != "DELETED") | .path)'
+   ```
+
+   Reviewing someone else's PR, `gh pr checkout <number>` first, so the tree holds the revision under review.
+   With no PR on the branch, or no CLI on the host, the same list comes off the base branch —
+   `git diff --name-only <base>...HEAD`. Only a human widens it, and the ask names the width: a path (a
+   module) or the repo (`git ls-files`). Fence off what no human wrote — build and generated output, vendored
+   dependencies, lockfiles, binaries. Done when the report's first line names the list and where it came from,
+   minus what the fence kept out.
 
 2. **Send in the auditor.** One read-only subagent — `comment-sicko` (Hermes: `delegate_task`) — whose whole
    brief is the scope, the fence, *What survives* and the stack file beside this one, handed over verbatim
@@ -44,7 +54,9 @@ roll has written that vocabulary down it sits in a file beside this one — `ref
 
 4. **Show the plan, then delete.** Per file: the count, each kill on one line, each protected comment with the
    clause that saved it. Then wait — a caller's pre-approval is the only thing that skips the wait — and delete
-   exactly what was kept killed. Done when the tree carries no guilty comment.
+   exactly what was kept killed. In a review the plan *is* the finding: it goes back as the note, and deleting
+   on a branch the sweep does not own is not its call. Done when the tree carries no guilty comment, or the
+   plan has gone back as written.
 
 5. **Fix each accepted flag at its root cause.** A trivial flag is a deletion: the dead path, the unused
    parameter, the call to the real API. A flag that needs a shape gets one sketch from the auditor, and the
@@ -100,8 +112,8 @@ The auditor's whole leash. Hand it over verbatim, judge against it, add nothing 
   us, or something we only call.
 - **Deleting beats explaining.** A comment that is the only thing making a line make sense wants a better name,
   a narrower type or a check — a shorter comment is still a comment, and a polished alibi is still an alibi.
-- **The fence holds.** Generated and vendored code is read at most, never edited, and a sweep never widens its
-  own scope to reach a guilty comment.
+- **The fence holds, and the width is the caller's.** Generated and vendored code is read at most, never
+  edited, and a sweep never widens its own scope — not to reach a guilty comment, not past the PR a human set.
 - **One stack's names live in one file** — `references/<stack>.md` beside this skill, added the first time a
   kitchen works that stack, never a glossary in here for a language this sweep may never see.
 - **One sweep, one change.** Deletions plus the fixes a flag named, nothing else, so the sweep reverts alone.
