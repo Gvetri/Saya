@@ -71,7 +71,7 @@ Getting a host ready to build and drive Android apps.
 
 Picking earlier work back up, whatever the stack and wherever the work is tracked.
 
-- **pickup** (typed): Reconstruct one prior trail and prove it against the task's live state — the code as it stands and the task's own status — so nothing carries over stale.
+- **pickup** (typed): Rebuild what an earlier session did, then check it against the current state of the task and the code, so nothing carries over stale.
 
 ### Code
 
