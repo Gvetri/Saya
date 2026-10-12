@@ -71,4 +71,4 @@ Getting a host ready to build and drive Android apps.
 
 The code a kitchen works on, whatever the stack.
 
-- **no-comments** (typed): Sweep a PR's changed files — a module or the whole repo only when you ask — for explanatory comments. A read-only auditor reports every kill and keep, the accepted kills go at the root cause, and every claimed constraint ends as a check or as open work.
+- **no-comments** (typed): Sweep the code a review hands over for explanatory comments — a module or the whole repo only when you ask. A second pair of eyes reports every delete and keep, the accepted ones go at the root cause, and every claimed constraint ends as a check or as open work.
